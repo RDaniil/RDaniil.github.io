@@ -1,0 +1,97 @@
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Float</title>
+  <style type="text/css">
+   .numArea { 
+    width: 90px; 
+    height: 50px; 
+    border: solid 2px #AAAAAA; 
+    font-family: Courier new, sans-serif;
+    font-weight:bold;
+    float: left;
+   }
+   .procElem { 
+    width: 100px;
+    height: 40px;
+    background: #00007a;
+    border: solid 2px #AAAAAA;
+    color: #00AAAA;
+    font-family:sans-serif;
+    font-weight:bold;
+   }
+   .buttons { 
+    width: 50px;
+    font-family: sans-serif;
+    font-weight:bold;
+   }
+    .regs { 
+    color: #CC1111;
+    font-weight:bold;
+   }
+  </style> 
+  </head>
+<body>
+  <table>
+    <tr>
+    <td>
+      <textarea id = "mantArea1", class="numArea">0.0124</textarea>
+    </td>
+    <td>
+      <div>*10^</div>
+    </td>
+    <td>
+      <textarea id = "expArea1", class="numArea">4</textarea>
+    </td>
+    <tr>
+    <button class = "buttons" onclick="insertpINF1()"> +INF</button>
+    <button class = "buttons" onclick="insertmINF1()"> -INF</button>
+    <button class = "buttons" onclick="insertpZero1()">+0</button>
+    <button class = "buttons" onclick="insertmZero1()">-0</button>
+    <button class = "buttons" onclick="insertNaN1()">  NaN</button>
+    </tr>
+  </table>
+
+  <table>
+    <td>
+      <textarea id = "mantArea2", class="numArea">23</textarea>
+    </td>
+    <td>
+      <div>*10^</div>
+    </td>
+    <td>
+      <textarea id = "expArea2", class="numArea">2</textarea>
+    </td>
+    </tr>
+    <tr>
+    <button class = "buttons" onclick="insertpINF2()"> +INF</button>
+    <button class = "buttons" onclick="insertmINF2()"> -INF</button>
+    <button class = "buttons" onclick="insertpZero2()">+0</button>
+    <button class = "buttons" onclick="insertmZero2()">-0</button>
+    <button class = "buttons" onclick="insertNaN2()">  NaN</button>
+    <tr>
+  </table>
+ 
+  <button onclick="confirmInput()">confirm</button>
+
+<table>
+  <tr>
+  <button class = "buttons" onclick="add()">+</button>
+  <button class = "buttons" onclick="sub()">-</button>
+  <button class = "buttons" onclick="mul()">*</button>
+  <button class = "buttons" onclick="div()">/</button>
+  <button class = "buttons" onclick="eql()">=</button>
+</tr>
+<tr>
+  <td>
+  <div>Result: </div>
+  <div id = "resultArea" class = "numArea">.</div>
+</td>
+</tr>
+</table>
+
+  <script type="text/javascript" src="float.js"></script> 
+
+
+ </body>
+</html>
