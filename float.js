@@ -12,30 +12,40 @@ var mFloat = function(sign, mant, exp, val){
 
 var pINF  = new mFloat(0, MAX_MFLOAT_MANT, 0, "pINF");
 var mINF  = new mFloat(1, -MAX_MFLOAT_MANT, 0, "mINF");
-var pZERO = new mFloat(0, 0, 0, "pZERO");
-var mZERO = new mFloat(1, 0, 0, "mZERO");
-var fNaN  = new mFloat(1, MAX_MFLOAT_MANT, 0, "fNaN");
+var pZero = new mFloat(0, 0, 0, "pZero");
+var mZero = new mFloat(1, 0, 0, "mZero");
+var fNaN  = new mFloat(1, 0, MAX_MFLOAT_LENGTH, "fNaN");
+
+var arrSpecialNum = [];
+arrSpecialNum.push(pINF);
+arrSpecialNum.push(mINF);
+arrSpecialNum.push(pZero);
+arrSpecialNum.push(mZero);
+arrSpecialNum.push(fNaN);
+
 var a = new mFloat(1, 1, 1, "");
 var b = new mFloat(1, 1, 1, "");
 
 
 mFloat.prototype.checkNumber = function()
 {
-	if(this.mant > MAX_MFLOAT_MANT){
-		alert("Its +INF");
+	if(this.mant >= MAX_MFLOAT_MANT){
+		console.log("Its +INF");
 		this.assign(pINF);
-		alert("Tst "+ this.mant);
+		console.log("Tst "+ this.mant);
 		return this;
 	}
-	if(this.mant < -MAX_MFLOAT_MANT){
+	if(this.mant <= -MAX_MFLOAT_MANT){
 		this.assign(mINF);
 		return;
 	}
-	if(this.mant == 0 && this.exp == 0){
+	console.log("CHECK NUMBER EPTA MANT = " + this.mant);
+	if(this.mant == 0.0){
+		console.log("Check number, is Zero");
 		if(this.sign == 1)
-			this.assign(mZERO);
+			this.assign(mZero);
 		else
-			this.assign(pZERO);
+			this.assign(pZero);
 		return;
 	}
 }
@@ -50,38 +60,18 @@ mFloat.prototype.assign = function(number)
 
 mFloat.prototype.checkEqual = function(number)
 {
-	return (this.sign == number.sign && this.mant == number.mant && this.exp == number.exp );
+	return ((this.sign == number.sign && this.mant == number.mant && this.exp == number.exp) || this.val == number.val);
 }
 
-mFloat.prototype.isSpecial = function(number)
+mFloat.prototype.isSpecial = function()
 {
-	return this.checkEqual(pINF) || this.checkEqual(mINF) || this.checkEqual(pZERO) || this.checkEqual(mZERO) || this.checkEqual(fNaN);
-}
-
-mFloat.prototype.assignIfSpecial = function(number)
-{
-	if(!this.isSpecial())
-		return;
-	if(this.checkEqual(pINF)){
-		this.assign(pINF);
-		return;
+	for (var i = 0; i < arrSpecialNum.length; i++) {
+		if(this.checkEqual(arrSpecialNum[i])){
+		console.log("Its SPECIAL Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
+			return arrSpecialNum[i];
+		}
 	}
-	if(this.checkEqual(mINF)){
-		this.assign(mINF);
-		return;
-	}
-	if(this.checkEqual(pZERO)){
-		this.assign(pZERO);
-		return;
-	}
-	if(this.checkEqual(mZERO)){
-		this.assign(mZERO);
-		return;
-	}
-	if(this.checkEqual(fNaN)){
-		this.assign(fNaN);
-		return;
-	}
+	return false;
 }
 
 mFloat.prototype.convertNum =  function(arrNum)
@@ -92,12 +82,12 @@ mFloat.prototype.convertNum =  function(arrNum)
 	this.exp  = Number(arrNum[2]);
 }
 
-
 mFloat.prototype.updateValue =  function()
 {
+	this.checkNumber();
+
 	if(this.isSpecial()){
-		this.checkNumber();
-		alert("Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
+		console.log("IN UPD THIS NUMBER IS SPECIAL Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
 		return;
 	}
 	var expVal = Math.pow(10, Number(this.exp));
@@ -110,10 +100,10 @@ mFloat.prototype.updateValue =  function()
 	var fullNum = this.mant * expVal;
 	//Вернет округленное значение числа длины MAX_MFLOAT_LENGTH+1
 	var strNum = fullNum.toPrecision(MAX_MFLOAT_LENGTH+1);
-	alert("Test str = "+ this.mant);
+	console.log("Test str = "+ this.mant);
 	this.val = strNum.substring(0,MAX_MFLOAT_LENGTH+1);
 	
-	alert("In UPD value Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
+	console.log("In UPD value Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
 }
 
 //Приведение порядка объекта к порядку exp
@@ -125,8 +115,6 @@ mFloat.prototype.ToExp = function(exp)
 			this.mant *= 10;
 			this.exp--;
 		}
-		// var formatMantStr = this.mant.toString();
-		// this.mant = formatMantStr.substring(0, MAX_MFLOAT_LENGTH+1);
 		return;
 	}
 
@@ -136,18 +124,52 @@ mFloat.prototype.ToExp = function(exp)
 			this.mant /= 10;
 			this.exp++;
 		}
-		// var formatMantStr = this.mant.toString();
-		// this.mant = formatMantStr.substring(0, MAX_MFLOAT_LENGTH+1);
 		return;
 	}
 }
 
-// var t = new mFloat(0, 42342343423, 2, "");
-// t.updateValue();
-// t.checkNumber();
-// alert(t.mant);
-// t.ToExp(0);
-// t.updateValue();
+function additiveOp()
+{
+
+	console.log("a "+ a.isSpecial() +" b " +b.isSpecial());
+	if(!(a.isSpecial() || b.isSpecial()))
+		return false;
+
+	var Acpy = a;
+	var Bcpy = b;
+
+	if(Bcpy.checkEqual(fNaN) || Acpy.checkEqual(fNaN)){
+		console.log("additiveOp its NAN!");
+		return fNaN;
+	}
+	if((Acpy.checkEqual(pINF) || Acpy.checkEqual(mINF)) && (Bcpy.checkEqual(pINF) || Bcpy.checkEqual(mINF))){
+		console.log("additiveOp its NAN!");
+		return fNaN;		
+	}
+	if(Acpy.checkEqual(mZero) || Acpy.checkEqual(pZero) || Bcpy.checkEqual(mZero) || Bcpy.checkEqual(pZero)){
+		console.log("additiveOp its number");
+		return false;
+	}
+		
+	if(Acpy.checkEqual(pINF) || Acpy.checkEqual(mINF)){
+		console.log("additiveOp its INF");
+		return Acpy;
+	} 
+		
+	if(Bcpy.checkEqual(pINF) || Bcpy.checkEqual(mINF)){
+		console.log("additiveOp its INF");
+		return Bcpy;
+	}
+
+	return fNaN;
+		
+}
+
+function printResult(result)
+{
+	var resultArea = document.getElementById("resultArea");
+	resultArea.value = "Value: " + result.val + ". mant:" + result.mant + ", exp: " + result.exp;
+}
 
 function confirmInput()
 {
@@ -172,19 +194,27 @@ function confirmInput()
 	b.updateValue();
 }
 
+//
+//СДЕЛАТЬ ПРОВЕРКИ НА ОСОБЫЕ СЛУЧАИ!1!
+//
+//
+//
+//
+//
+
 function add()
 {
 	a.ToExp(b.exp);
-
-	if(a == fNaN || b == fNaN){
-		var result = fNaN;
-		return result;
+	var resSpecCheck = additiveOp();
+	if(resSpecCheck){
+		console.log("Rsult of operation: " + a.val  + " + " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
+		printResult(resSpecCheck);
 	}
-
+	console.log("passed res check" + resSpecCheck);
 	var sum = Number(a.val) + Number(b.val);
 	var ten = Math.pow(10, a.exp);
 	sum /= ten;
-	alert("TEST TEST : " + a.mant + " " + b.mant + " " + sum);
+	console.log("TEST TEST : " + a.mant + " " + b.mant + " " + sum);
 	var sign;
 	if(sum > 0)
 		sign = 0;
@@ -193,26 +223,29 @@ function add()
 
 	var result = new mFloat(sign, sum, a.exp, "");
 	result.updateValue();
-	alert("Rsult of operation: " + a.val  + " + " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
-
-	return;
+	console.log("Rsult of operation: " + a.val  + " + " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	printResult(result);
 	
 }
 
 function sub()
 {
 	a.ToExp(b.exp);
-
+	var resSpecCheck = additiveOp();
+	if(resSpecCheck){
+		console.log("Rsult of operation: " + a.val  + " + " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
+		printResult(resSpecCheck);
+	}
 	if(a == fNaN || b == fNaN){
 		var result = fNaN;
-		return;
+		printResult(result);
 	}
 
 	var res = Number(a.val) - Number(b.val);
 	var ten = Math.pow(10, a.exp);
 	res /= ten;
 
-	alert("TEST TEST : " + res);
+	console.log("TEST TEST : " + res);
 	var sign;
 	if(res > 0)
 		sign = 0;
@@ -221,15 +254,15 @@ function sub()
 
 	var result = new mFloat(sign, res, a.exp, "");
 	result.updateValue();
-	alert("Rsult of operation: " + a.val  + " - " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Rsult of operation: " + a.val  + " - " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
 
-	return;
+	printResult(result);
 }
 function mul()
 {
 	if(a == fNaN || b == fNaN){
 		var result = fNaN;
-		return;
+		printResult(result);
 	}
 
 	var prodMant = Number(a.mant) * Number(b.mant);
@@ -243,16 +276,16 @@ function mul()
 
 	var result = new mFloat(sign, prodMant, prodExp, "");
 	result.updateValue();
-	alert("Rsult of operation: " + a.val + " * " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Rsult of operation: " + a.val + " * " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
 
-	return;
+	printResult(result);
 	
 }
 function div()
 {
 	if(a == fNaN || b == fNaN){
 		var result = fNaN;
-		return;
+		printResult(result);
 	}
 
 	var quotMant = Number(a.mant) / Number(b.mant);
@@ -266,20 +299,80 @@ function div()
 
 	var result = new mFloat(sign, quotMant, quotExp, "");
 	result.updateValue();
-	alert("Rsult of operation: " + a.val + " / " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Rsult of operation: " + a.val + " / " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
 
-	return;
+	printResult(result);
 	
 }
 
 
-// insertpINF1();
-// insertmINF1();
-// insertpZero1();
-// insertmZero1();
-// insertNaN1();
-// insertpINF2();
-// insertmINF2();
-// insertpZero2();
-// insertmZero2();
-// insertNaN2();
+function insertpINF1()
+{
+ var mantArea1 = document.getElementById("mantArea1");
+ mantArea1.value = pINF.mant;
+ var expArea1 = document.getElementById("expArea1");
+ expArea1.value = pINF.exp;
+}
+function insertmINF1()
+{
+ var mantArea1 = document.getElementById("mantArea1");
+ mantArea1.value = mINF.mant;
+ var expArea1 = document.getElementById("expArea1");
+ expArea1.value = mINF.exp;
+}
+function insertpZero1()
+{
+ var mantArea1 = document.getElementById("mantArea1");
+ mantArea1.value = pZero.mant;
+ var expArea1 = document.getElementById("expArea1");
+ expArea1.value = pZero.exp;
+}
+function insertmZero1()
+{
+ var mantArea1 = document.getElementById("mantArea1");
+ mantArea1.value = mZero.mant;
+ var expArea1 = document.getElementById("expArea1");
+ expArea1.value = mZero.exp;
+}
+function insertNaN1()
+{
+ var mantArea1 = document.getElementById("mantArea1");
+ mantArea1.value = fNaN.mant;
+ var expArea1 = document.getElementById("expArea1");
+ expArea1.value = fNaN.exp;
+}
+function insertpINF2()
+{
+ var mantArea2 = document.getElementById("mantArea2");
+ mantArea2.value = pINF.mant;
+ var expArea2 = document.getElementById("expArea2");
+ expArea2.value = pINF.exp;
+}
+function insertmINF2()
+{
+ var mantArea2 = document.getElementById("mantArea2");
+ mantArea2.value = mINF.mant;
+ var expArea2 = document.getElementById("expArea2");
+ expArea2.value = mINF.exp;
+}
+function insertpZero2()
+{
+ var mantArea2 = document.getElementById("mantArea2");
+ mantArea2.value = pZero.mant;
+ var expArea2 = document.getElementById("expArea2");
+ expArea2.value = pZero.exp;
+}
+function insertmZero2()
+{
+ var mantArea2 = document.getElementById("mantArea2");
+ mantArea2.value = mZero.mant;
+ var expArea2 = document.getElementById("expArea2");
+ expArea2.value = mZero.exp;
+}
+function insertNaN2()
+{
+ var mantArea2 = document.getElementById("mantArea2");
+ mantArea2.value = fNaN.mant;
+ var expArea2 = document.getElementById("expArea2");
+ expArea2.value = fNaN.exp;
+}

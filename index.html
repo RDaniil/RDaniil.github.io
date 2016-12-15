@@ -4,7 +4,7 @@
   <title>Float</title>
   <style type="text/css">
    .numArea { 
-    width: 90px; 
+    width: 100px; 
     height: 50px; 
     border: solid 2px #AAAAAA; 
     font-family: Courier new, sans-serif;
@@ -28,6 +28,14 @@
     .regs { 
     color: #CC1111;
     font-weight:bold;
+   }
+    .result { 
+    width: 400px; 
+    height: 50px; 
+    border: solid 2px #AAAAAA; 
+    font-family: Courier new, sans-serif;
+    font-weight:bold;
+    float: left;
    }
   </style> 
   </head>
@@ -85,7 +93,7 @@
 <tr>
   <td>
   <div>Result: </div>
-  <div id = "resultArea" class = "numArea">.</div>
+  <textarea id = "resultArea" class = "result">.</textarea>
 </td>
 </tr>
 </table>
