@@ -98,9 +98,10 @@ mFloat.prototype.normalize =  function()
 // 		}
 // 	}
 // 	console.log("Normalized from " + copy.mant +" *10^ " + copy.exp+ " to " + this.mant +" *10^ " + this.exp);
-	var pointPos = this.mant.length;
+	//var pointPos = this.mant.length;
 
 	var thisMantStr = this.mant.toString();
+	var pointPos = thisMantStr.length;
 	for (var i = 0; i < thisMantStr.length; i++) {
 		if(thisMantStr.charAt(i) == "."){
 			pointPos = i;
