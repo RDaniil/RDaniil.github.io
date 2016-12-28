@@ -98,7 +98,7 @@ mFloat.prototype.normalize =  function()
 // 		}
 // 	}
 // 	console.log("Normalized from " + copy.mant +" *10^ " + copy.exp+ " to " + this.mant +" *10^ " + this.exp);
-	var pointPos;
+	var pointPos = this.mant.length;
 
 	var thisMantStr = this.mant.toString();
 	for (var i = 0; i < thisMantStr.length; i++) {
@@ -115,7 +115,7 @@ mFloat.prototype.normalize =  function()
 	//Разница между позицией где должна стоять точка и позицией где онастоит сейчас
 	this.exp -= pointPos -1;
 	mantStr = mantSub1 + "." + mantSub2 + mantSub3;
-	console.log("Normalize Debug mant = " + mantStr + " POint pos = " + pointPos + " this.mant.len = " + this.mant.length);
+	console.log("Normalize Debug mant = " + mantStr + " POint pos = " + pointPos + " this.mant.len = " +this.mant.length);
 	this.mant = mantStr;
 }
 
