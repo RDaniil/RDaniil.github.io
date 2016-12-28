@@ -1,8 +1,8 @@
-var MAX_MFLOAT_MANT = 9999999999;//Мантисса должна иметь столько цифр, сколько макс. длина
-var MAX_MFLOAT_EXP = 10;	
-var MAX_MFLOAT_LENGTH = 10;		
-
-
+var MAX_MFLOAT_MANT = 999999;//Мантисса должна иметь столько цифр, сколько макс. длина
+var MAX_MFLOAT_EXP = 99;	
+var MAX_MFLOAT_LENGTH = 6;		
+//Сделать строгий формат: вводится меньше - ошибка, больше - ошибка
+//Экспонента порядка 99
 var mFloat = function(sign, mant, exp, val){
 	this.sign = sign;
 	this.mant = mant;
@@ -88,6 +88,55 @@ mFloat.prototype.convertNum =  function(arrNum)
 	this.exp  = Number(arrNum[2]);
 }
 
+mFloat.prototype.normalize =  function()
+ {
+// 	var copy = new mFloat(0, this.mant, this.exp, "");
+// 	if(Math.abs(this.mant) < 100000){
+// 		while(Math.abs(this.mant) < 100000){
+// 			this.mant *= 10;
+// 			this.exp--;
+// 		}
+// 	}
+// 	console.log("Normalized from " + copy.mant +" *10^ " + copy.exp+ " to " + this.mant +" *10^ " + this.exp);
+	var pointPos;
+
+	var thisMantStr = this.mant.toString();
+	for (var i = 0; i < thisMantStr.length; i++) {
+		if(thisMantStr.charAt(i) == "."){
+			pointPos = i;
+		}
+	}
+	var mantStr = this.mant.toString();
+	mantSub1 = mantStr.substring(0, 1);
+	mantSub2 = mantStr.substring(1, pointPos);
+	mantSub3 = mantStr.substring(pointPos+1);
+
+	console.log("m1 = " + mantSub1 + " m2 = " + mantSub2 + " m3 = " + mantSub3);
+	//Разница между позицией где должна стоять точка и позицией где онастоит сейчас
+	this.exp -= pointPos -1;
+	mantStr = mantSub1 + "." + mantSub2 + mantSub3;
+	console.log("Normalize Debug mant = " + mantStr + " POint pos = " + pointPos + " this.mant.len = " + this.mant.length);
+	this.mant = mantStr;
+}
+
+mFloat.prototype.mFround =  function()
+{
+	var mantStr = this.mant.toString();	
+	mantSub1 = mantStr.substring(0, 1);
+	mantSub2 = mantStr.substring(2, 7);
+	mantSub3 = mantStr.substring(7);
+
+	console.log("Debug mant = " + mantStr);
+	if(mantSub3 == ""){
+		mantStr = mantSub1 + mantSub2 + ".0";
+	}else{
+	mantStr = mantSub1 + mantSub2 + "." + mantSub3;
+	}
+	console.log("Rounded from " + this.mant + " to " + Math.round(mantStr));
+	this.exp -= 5;
+	this.mant = Math.round(mantStr);
+}
+
 mFloat.prototype.updateValue =  function()
 {
 	this.checkNumber();
@@ -99,15 +148,22 @@ mFloat.prototype.updateValue =  function()
 	var expVal = Math.pow(10, Number(this.exp));
 
 	//Выделение значащей точной части мантиссы
+	this.normalize();
+	this.mFround();
+
 	var strMant = this.mant.toString();
+	this.mant = Math.round(this.mant);
 	this.mant = Number(strMant.substring(0,MAX_MFLOAT_LENGTH+1));
 
+
 	//Полное значение числа, обрезается до занчащего 
-	var fullNum = this.mant * expVal;
+	//var fullNum = this.mant * expVal;
 	//Вернет округленное значение числа длины MAX_MFLOAT_LENGTH+1
-	var strNum = fullNum.toPrecision(MAX_MFLOAT_LENGTH+1);
-	console.log("Test str = "+ this.mant);
-	this.val = strNum.substring(0,MAX_MFLOAT_LENGTH+1);
+	//var strNum = fullNum.toPrecision(MAX_MFLOAT_LENGTH+1);
+	//var strNum = fullNum.toFixed(MAX_MFLOAT_LENGTH+1);
+
+	//console.log("Test str = "+ fullNum);
+	//this.val = strNum.substring(0,MAX_MFLOAT_LENGTH+1);
 	
 	console.log("In UPD value Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
 }
@@ -115,15 +171,8 @@ mFloat.prototype.updateValue =  function()
 //Приведение порядка объекта к порядку exp
 mFloat.prototype.ToExp = function(exp)
 {
-	if(this.exp >= exp){
-		var difference =  this.exp - exp;
-		for (var i = 0; i < difference; i++) {
-			this.mant *= 10;
-			this.exp--;
-		}
+	if(this.exp == exp)
 		return;
-	}
-
 	if(this.exp < exp){
 		var difference =  exp - this.exp;
 		for (var i = 0; i < difference; i++) {
@@ -132,6 +181,7 @@ mFloat.prototype.ToExp = function(exp)
 		}
 		return;
 	}
+	alert("Incorrect input \"ToExp\"! Exp need to be higher!");
 }
 
 function additiveOp()
@@ -223,16 +273,15 @@ function printResult(result)
 
 function checkInput(mant, exp)
 {
-	//Удаляется одна точка
-	var formatMant = mant.replace(/\./,'');
-	var mantRegEx = /^-?\d+$/;
+	var mantRegEx = /^-?\d\.\d{5}$/;
+	//var mantRegEx = /^-?\d{6}$/;
 	var expRegEx = /^-?[0-9]{1,2}$/;
-	if(!mantRegEx.test(formatMant)){
-		alert("Incorrect mant!");
+	if(!mantRegEx.test(mant)){
+		alert("Incorrect mant! (Format example: 641337)");
 		return false;
 	}
 	if(!expRegEx.test(exp)){
-		alert("Incorrect exp!");
+		alert("Incorrect exp! (Must be 1-digit or 2-digit number)");
 		return false;
 	}
 	return true;
@@ -246,7 +295,7 @@ function confirmInput()
 	var mantArea2 = document.getElementById('mantArea2');
 	var expArea2 = document.getElementById('expArea2');
 	
-	if(!checkInput(mantArea1.value, expArea1.value) && !checkInput(mantArea2.value, expArea2.value))
+	if(!(checkInput(mantArea1.value, expArea1.value) && checkInput(mantArea2.value, expArea2.value)))
 		return;
 
 	if(mantArea1.value.charAt(1) == "-")
@@ -269,111 +318,107 @@ function add()
 {
 	var resSpecCheck = additiveOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.val  + " + " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
-		printResult("Result of operation: " + a.val  + " + " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
+		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
 		return;
 	}
 	if(!a.isSpecial()){
-		a.ToExp(b.exp);
+		if(a.exp < b.exp){
+			a.ToExp(b.exp);
+		}else{
+			b.ToExp(a.exp);
+		}
 	}
 	console.log("passed res check with result: " + resSpecCheck);
-	var sum = Number(a.val) + Number(b.val);
-	var ten = Math.pow(10, a.exp);
-	sum /= ten;
-	var sign;
-	if(sum > 0)
-		sign = 0;
-	else 
-		sign = 1;
-
-	var result = new mFloat(sign, sum, a.exp, "");
+	var sumMant = Number(Number(a.mant) + Number(b.mant));
+	var result = new mFloat(0, sumMant, a.exp, "");
 	result.updateValue();
-	console.log("Result of operation: " + a.val  + " + " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
-	printResult("Result of operation: " + a.val  + " + " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
+	printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
 	
 }
 
 function sub()
 {
 
-	b.sign = (b.sign + 1) % 2;
-	//b.val = -b.val;
 	b.mant = -b.mant;
 
 	var resSpecCheck = additiveOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.val  + " - " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
-		printResult("Result of operation: " + a.val  + " - " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
+		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
 		return;
 	}
 	if(!a.isSpecial()){
-		a.ToExp(b.exp);
+		if(a.exp < b.exp){
+			a.ToExp(b.exp);
+		}else{
+			b.ToExp(a.exp);
+		}
 	}
-
-	var res = Number(a.val) - Number(b.val);
-	var ten = Math.pow(10, a.exp);
-	res /= ten;
-
-	var sign;
-	if(res > 0)
-		sign = 0;
-	else 
-		sign = 1;
-
-	var result = new mFloat(sign, res, a.exp, "");
+	console.log("passed res check with result: " + resSpecCheck);
+	var subMant = Number(Number(a.mant) - Number(b.mant));
+	var result = new mFloat(0, subMant, a.exp, "");
 	result.updateValue();
-	console.log("Result of operation: " + a.val  + " - " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
-
-	printResult("Result of operation: " + a.val  + " - " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
+	printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
+	b.mant = -b.mant;
 }
 function mul()
 {
 	var resSpecCheck = multiplicatOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.val  + " * " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
-		printResult("Result of operation: " + a.val  + " * " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
+		console.log("Result of operation: " + a.val  + " * " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.val  + " * " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
 		return;
 	}
 
 	console.log("passed res check with result: " + resSpecCheck);
 
+	if(Math.abs(Math.abs(a.exp) - Math.abs(b.exp)) > 6)
+	{
+		if(a.exp > b.exp){
+			var result = new mFloat(0, a.mant, a.exp, "");
+		}else{
+			var result = new mFloat(0, a.mant, a.exp, "");
+		}
+		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " * " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
+		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " * " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
+		return;
+	}
+
 	var prodMant = Number(a.mant) * Number(b.mant);
 	var prodExp = Number(a.exp) + Number(b.exp);
 
-	var sign;
-	if(prodMant > 0)
-		sign = 0;
-	else 
-		sign = 1;
 
-	var result = new mFloat(sign, prodMant, prodExp, "");
+	var result = new mFloat(0, prodMant, prodExp, "");
 	result.updateValue();
-	console.log("Result of operation: " + a.val + " * " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " * " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
 
-	printResult("Result of operation: " + a.val  + " * " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " * " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
 	
 }
 function div()
 {
 	if(b.checkEqual(mZero) || b.checkEqual(pZero)){
 		alert("Division by zero");
-		console.log("Result of operation: " + a.val + " / " + b.val + " Is Exp: " + fNaN.exp + " mant: " + fNaN.mant + " value: " + fNaN.val + " sign: " + fNaN.sign);
-		printResult("Result of operation: " + a.val + " / " + b.val + " Is Exp: " + fNaN.exp + " mant: " + fNaN.mant + " value: " + fNaN.val + " sign: " + fNaN.sign);
+		console.log("Result of operation: " + a.val + " / " + b.val + " Is Exp: " + fNaN.exp + " mant: " + fNaN.mant + " value: " + fNaN.val);
+		printResult("Result of operation: " + a.val + " / " + b.val + " Is Exp: " + fNaN.exp + " mant: " + fNaN.mant + " value: " + fNaN.val);
 		return;
 	}
 
 	//При делении обычного числа на бесконечность получим ноль
 	if(!a.isSpecial()){
 		if(b.checkEqual(pINF) || b.checkEqual(mINF)){
-		printResult("Result of operation: " + a.val + " / " + b.val + " Is Exp: " + pZero.exp + " mant: " + pZero.mant + " value: " + pZero.val + " sign: " + pZero.sign);
+		printResult("Result of operation: " + a.val + " / " + b.val + " Is Exp: " + pZero.exp + " mant: " + pZero.mant + " value: " + pZero.val);
 
 		}
 	}
 
 	var resSpecCheck = multiplicatOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.val  + " / " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
-		printResult("Result of operation: " + a.val  + " / " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val + " sign: " + resSpecCheck.sign);
+		console.log("Result of operation: " + a.val  + " / " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.val  + " / " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
 		return;
 	}
 
@@ -390,9 +435,9 @@ function div()
 
 	var result = new mFloat(sign, quotMant, quotExp, "");
 	result.updateValue();
-	console.log("Result of operation: " + a.val + " / " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	console.log("Result of operation: " + a.val + " / " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val);
 
-	printResult("Result of operation: " + a.val  + " / " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val + " sign: " + result.sign);
+	printResult("Result of operation: " + a.val  + " / " + b.val + " Exp: " + result.exp + " mant: " + result.mant + " value: " + result.val);
 	
 }
 
