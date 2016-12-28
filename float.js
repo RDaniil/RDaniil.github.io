@@ -274,10 +274,12 @@ function printResult(result)
 function checkInput(mant, exp)
 {
 	var mantRegEx = /^-?\d\.\d{5}$/;
+	var specRegEx = /^-?999999$/;
+
 	//var mantRegEx = /^-?\d{6}$/;
 	var expRegEx = /^-?[0-9]{1,2}$/;
-	if(!mantRegEx.test(mant)){
-		alert("Incorrect mant! (Format example: 641337)");
+	if(!(mantRegEx.test(mant) || specRegEx.test(mant) || mant == 0)){
+		alert("Incorrect mant! (Format example: 6.41337)");
 		return false;
 	}
 	if(!expRegEx.test(exp)){
