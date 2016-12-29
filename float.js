@@ -306,8 +306,8 @@ function add()
 {
 	var resSpecCheck = additiveOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
-		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.mant + " *10^" + resSpecCheck.exp + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " + " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.mant + " *10^" + resSpecCheck.exp + " value: " + resSpecCheck.val);
 		return;
 	}
 	if(!a.isSpecial()){
@@ -333,8 +333,8 @@ function sub()
 
 	var resSpecCheck = additiveOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
-		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		console.log("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.mant + " *10^" + resSpecCheck.exp + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " + resSpecCheck.mant + " *10^" + resSpecCheck.exp + " value: " + resSpecCheck.val);
 		return;
 	}
 	if(!a.isSpecial()){
@@ -357,8 +357,8 @@ function mul()
 {
 	var resSpecCheck = multiplicatOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.val  + " * " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
-		printResult("Result of operation: " + a.val  + " * " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		console.log("Result of operation: " + a.val  + " * " + b.val + " = " + resSpecCheck.mant + " * 10^ " + resSpecCheck.exp + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.val  + " * " + b.val + " = " + resSpecCheck.mant + " * 10^ " + resSpecCheck.exp + " value: " + resSpecCheck.val);
 		return;
 	}
 
@@ -407,8 +407,8 @@ function div()
 
 	var resSpecCheck = multiplicatOp();
 	if(resSpecCheck){
-		console.log("Result of operation: " + a.val  + " / " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
-		printResult("Result of operation: " + a.val  + " / " + b.val + " Exp: " + resSpecCheck.exp + " mant: " + resSpecCheck.mant + " value: " + resSpecCheck.val);
+		console.log("Result of operation: " + a.val  + " / " + b.val + " = " + resSpecCheck.mant + " * 10^ " + resSpecCheck.exp + " value: " + resSpecCheck.val);
+		printResult("Result of operation: " + a.val  + " / " + b.val + " = " + resSpecCheck.mant + " * 10^ " + resSpecCheck.exp + " value: " + resSpecCheck.val);
 		return;
 	}
 
