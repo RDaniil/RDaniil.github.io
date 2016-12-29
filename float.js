@@ -1,8 +1,7 @@
 var MAX_MFLOAT_MANT = 999999;//Мантисса должна иметь столько цифр, сколько макс. длина
 var MAX_MFLOAT_EXP = 99;	
 var MAX_MFLOAT_LENGTH = 6;		
-//Сделать строгий формат: вводится меньше - ошибка, больше - ошибка
-//Экспонента порядка 99
+
 var mFloat = function(sign, mant, exp, val){
 	this.sign = sign;
 	this.mant = mant;
@@ -26,7 +25,7 @@ arrSpecialNum.push(fNaN);
 var a = new mFloat(1, 1, 1, "");
 var b = new mFloat(1, 1, 1, "");
 
-
+//Присваивает числу табличные особые значения, если число является особым
 mFloat.prototype.checkNumber = function()
 {
 	console.log("Checking: mant : " + this.mant + " exp: " +this.exp);
@@ -56,6 +55,7 @@ mFloat.prototype.checkNumber = function()
 	console.log("Check number: default return - its number");
 }
 
+//Присваивает соотв значения полей объекта number ЭТОМУ объекту
 mFloat.prototype.assign = function(number)
 {
 	this.sign = number.sign;
@@ -64,11 +64,13 @@ mFloat.prototype.assign = function(number)
 	this.val = number.val;
 }
 
+//Возварщает true в случае равенства number и ЭТОГО объекта иначе false
 mFloat.prototype.checkEqual = function(number)
 {
 	return ((this.sign == number.sign && this.mant == number.mant && this.exp == number.exp) || this.val == number.val);
 }
 
+//Возвращает true в случае если число является особым, иначе false
 mFloat.prototype.isSpecial = function()
 {
 	for (var i = 0; i < arrSpecialNum.length; i++) {
@@ -80,28 +82,11 @@ mFloat.prototype.isSpecial = function()
 	return false;
 }
 
-mFloat.prototype.convertNum =  function(arrNum)
-{
-	//var regExMant = /-*[0-9]{6}/;
-	this.sign = arrNum[0];
-	this.mant = Number(arrNum[1]);
-	this.exp  = Number(arrNum[2]);
-}
-
+//Преобразовывает число в формат вида 8.13374
 mFloat.prototype.normalize =  function()
  {
-// 	var copy = new mFloat(0, this.mant, this.exp, "");
-// 	if(Math.abs(this.mant) < 100000){
-// 		while(Math.abs(this.mant) < 100000){
-// 			this.mant *= 10;
-// 			this.exp--;
-// 		}
-// 	}
-// 	console.log("Normalized from " + copy.mant +" *10^ " + copy.exp+ " to " + this.mant +" *10^ " + this.exp);
-	//var pointPos = this.mant.length;
-
 	var thisMantStr = this.mant.toString();
-	var pointPos = thisMantStr.length;
+	var pointPos = thisMantStr.length;	
 	for (var i = 0; i < thisMantStr.length; i++) {
 		if(thisMantStr.charAt(i) == "."){
 			pointPos = i;
@@ -114,12 +99,13 @@ mFloat.prototype.normalize =  function()
 
 	console.log("m1 = " + mantSub1 + " m2 = " + mantSub2 + " m3 = " + mantSub3);
 	//Разница между позицией где должна стоять точка и позицией где онастоит сейчас
-	this.exp -= pointPos -1;
+	this.exp = Number(this.exp) + (pointPos - 1);
 	mantStr = mantSub1 + "." + mantSub2 + mantSub3;
 	console.log("Normalize Debug mant = " + mantStr + " POint pos = " + pointPos + " this.mant.len = " +this.mant.length);
 	this.mant = mantStr;
 }
 
+//Округляет порядок единиц 
 mFloat.prototype.mFround =  function()
 {
 	var mantStr = this.mant.toString();	
@@ -138,6 +124,7 @@ mFloat.prototype.mFround =  function()
 	this.mant = Math.round(mantStr);
 }
 
+//Округляет число и обрезает до соотв. формату
 mFloat.prototype.updateValue =  function()
 {
 	this.checkNumber();
@@ -155,16 +142,6 @@ mFloat.prototype.updateValue =  function()
 	var strMant = this.mant.toString();
 	this.mant = Math.round(this.mant);
 	this.mant = Number(strMant.substring(0,MAX_MFLOAT_LENGTH+1));
-
-
-	//Полное значение числа, обрезается до занчащего 
-	//var fullNum = this.mant * expVal;
-	//Вернет округленное значение числа длины MAX_MFLOAT_LENGTH+1
-	//var strNum = fullNum.toPrecision(MAX_MFLOAT_LENGTH+1);
-	//var strNum = fullNum.toFixed(MAX_MFLOAT_LENGTH+1);
-
-	//console.log("Test str = "+ fullNum);
-	//this.val = strNum.substring(0,MAX_MFLOAT_LENGTH+1);
 	
 	console.log("In UPD value Exp: " + this.exp + " mant: " + this.mant + " value: " + this.val);
 }
@@ -185,9 +162,12 @@ mFloat.prototype.ToExp = function(exp)
 	alert("Incorrect input \"ToExp\"! Exp need to be higher!");
 }
 
+//Рассмотрение особых случаев для аддитивных операций в
+//В особом случае возвращается результат операции
+//Иначе (обычный случай (опреация проводится над обычными числами))
+//возвращается false
 function additiveOp()
 {
-
 	console.log("a "+ a.isSpecial() +" b " +b.isSpecial());
 	if(!(a.isSpecial() || b.isSpecial())){
 		console.log("additiveOp its both just numbers!");
@@ -232,9 +212,12 @@ function additiveOp()
 	return fNaN;	
 }
 
+//Рассмотрение особых случаев для мультипликативных операций в
+//В особом случае возвращается результат операции
+//Иначе (обычный случай (опреация проводится над обычными числами))
+//возвращается false
 function multiplicatOp()
 {
-
 	console.log("a "+ a.isSpecial() +" b " +b.isSpecial());
 	if(!(a.isSpecial() || b.isSpecial())){
 		console.log("mulriplicatOp its both just numbers!");
@@ -266,12 +249,14 @@ function multiplicatOp()
 	return fNaN;	
 }
 
+//Вывод в поле для результата
 function printResult(result)
 {
 	var resultArea = document.getElementById("resultArea");
 	resultArea.value= result;
 }
 
+//Проверка введенных чисел регулярками на соотв. формату
 function checkInput(mant, exp)
 {
 	var mantRegEx = /^-?\d\.\d{5}$/;
@@ -367,6 +352,7 @@ function sub()
 	printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
 	b.mant = -b.mant;
 }
+
 function mul()
 {
 	var resSpecCheck = multiplicatOp();
@@ -401,6 +387,7 @@ function mul()
 	printResult("Result of operation: " + a.mant + "*10^"+ a.exp + " * " + b.mant + "*10^"+ b.exp + " = " +  result.mant + " * 10^ "+ result.exp );
 	
 }
+
 function div()
 {
 	if(b.checkEqual(mZero) || b.checkEqual(pZero)){
